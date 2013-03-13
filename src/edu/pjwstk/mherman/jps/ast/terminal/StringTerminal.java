@@ -7,7 +7,7 @@ public class StringTerminal implements IStringTerminal {
 
 	private String value;
 	
-	StringTerminal(String value) {
+	public StringTerminal(String value) {
 		this.value = value;
 	}
 	

@@ -7,7 +7,7 @@ public class DoubleTerminal implements IDoubleTerminal {
 
 	private Double value;
 	
-	DoubleTerminal(Double value) {
+	public DoubleTerminal(Double value) {
 		this.value = value;
 	}
 	

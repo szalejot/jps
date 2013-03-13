@@ -7,7 +7,7 @@ public class BooleanTerminal implements IBooleanTerminal {
 
 	private Boolean value;
 	
-	BooleanTerminal(Boolean value) {
+	public BooleanTerminal(Boolean value) {
 		this.value = value;
 	}
 	

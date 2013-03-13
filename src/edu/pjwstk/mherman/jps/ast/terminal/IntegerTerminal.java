@@ -7,7 +7,7 @@ public class IntegerTerminal implements IIntegerTerminal {
 
 	private Integer value;
 	
-	IntegerTerminal(Integer value) {
+	public IntegerTerminal(Integer value) {
 		this.value = value;
 	}
 	

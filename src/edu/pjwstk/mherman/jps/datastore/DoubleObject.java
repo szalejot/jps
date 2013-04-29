@@ -7,9 +7,9 @@ public class DoubleObject implements IDoubleObject {
 	
 	private Double value;
 	private String name;
-	private OID oid;
+	private IOID oid;
 	
-	public DoubleObject(Double value, String name, OID oid) {
+	public DoubleObject(Double value, String name, IOID oid) {
 		this.value = value;
 		this.name = name;
 		this.oid = oid;
@@ -29,5 +29,10 @@ public class DoubleObject implements IDoubleObject {
 	public IOID getOID() {
 		return oid;
 	}
+
+    @Override
+    public String toString() {
+        return "<" + ((OID) oid).getId() + ", " + name + ", " + value + ">";
+    }	
 
 }

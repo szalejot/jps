@@ -20,6 +20,7 @@ public class MainClass {
 	 */
 	public static void main(String[] args) {
 		// mini-projekt 2
+		System.out.println("Wyniki dla testów mini-projektu 2: QResStack");
 		{
 			// (struct(1, 2+1), (bag("test", „Ala”) as nazwa));
 			QResStack qres = new QResStack();
@@ -182,9 +183,10 @@ public class MainClass {
 			System.out.println(qres.pop().toString());
 		}
 		
-		
+		System.out.println("Wyniki dla testów mini-projektu 2: SBAStore");
 		SBAStore store = new SBAStore();
-		store.loadXML("..\res\test.xml");
+		store.loadXML("../res/test.xml");
+		store.printStoreContent();
 
 	}
 

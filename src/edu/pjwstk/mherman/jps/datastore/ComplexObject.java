@@ -36,4 +36,20 @@ public class ComplexObject implements IComplexObject {
 		return childOIDs;
 	}
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<" + ((OID) oid).getId() + ", " + name + ", {");
+        
+        for (IOID oid : childOIDs) {
+            sb.append(((OID) oid).getId() + ", ");
+        }
+        if (!childOIDs.isEmpty()) {
+            //usun ostatni przecinek
+            sb.delete(sb.length()-2, sb.length());
+        }
+        sb.append("}>");
+        return  sb.toString();
+    }
+	
 }

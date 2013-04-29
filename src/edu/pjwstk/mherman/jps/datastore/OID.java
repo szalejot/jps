@@ -10,6 +10,10 @@ public class OID implements IOID {
 	public OID(Long id) {
 		this.id = id;
 	}
+	
+	public Long getId() {
+	    return id;
+	}
 
 	@Override
 	public int hashCode() {

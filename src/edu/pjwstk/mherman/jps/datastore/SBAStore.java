@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -224,7 +225,8 @@ public class SBAStore implements ISBAStore {
     
     public void printStoreContent() {
         System.out.println("entryOID = " + ((OID) entryOID).getId());
-        for(Map.Entry<IOID, ISBAObject> entry : store.entrySet()) {
+        Map<IOID, ISBAObject> treeMap = new TreeMap<IOID, ISBAObject>(store);
+        for(Map.Entry<IOID, ISBAObject> entry : treeMap.entrySet()) {
             System.out.println(entry.getValue().toString());
         }
     }

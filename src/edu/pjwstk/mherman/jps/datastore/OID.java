@@ -2,7 +2,7 @@ package edu.pjwstk.mherman.jps.datastore;
 
 import edu.pjwstk.jps.datastore.IOID;
 
-public class OID implements IOID {
+public class OID implements IOID, Comparable<OID> {
 	private static final long serialVersionUID = 620323840230316378L;
 	
 	private Long id;
@@ -39,5 +39,16 @@ public class OID implements IOID {
 			return false;
 		return true;
 	}
+
+    @Override
+    public int compareTo(OID arg0) {
+        if (this.equals(arg0)) {
+            return 0;
+        } else if (this.id < arg0.id) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 
 }

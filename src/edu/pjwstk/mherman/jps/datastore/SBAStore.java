@@ -1,7 +1,9 @@
 package edu.pjwstk.mherman.jps.datastore;
 
 import java.io.FileInputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -53,26 +55,110 @@ public class SBAStore implements ISBAStore {
 		return new OID(actualOID++);
 	}
 
-	@Override
-	public void addJavaObject(Object o, String objectName) {
-		throw new UnsupportedOperationException();
+    @Override
+    public void addJavaObject(Object o, String objectName) {
+        if (getEntryOID() == null) {
+            System.out.println("ERROR: Xml have to be loaded before adding java objects to store.");
+            return;
+        }
+        addJavaObject(o, objectName, true);
+    }
+
+	@SuppressWarnings("rawtypes")
+    private OID addJavaObject(Object o, String objectName, boolean isRoot) {    
+	    ISBAObject object = null;
+	    OID oid = generateUniqueOID();
+	    //is it simple object?
+	    if (o instanceof Integer) {
+	        object = new IntegerObject((Integer) o, objectName, oid);
+	    } else if (o instanceof Double) {
+	        object = new DoubleObject((Double) o, objectName, oid);
+	    } else if (o instanceof Boolean) {
+	        object = new BooleanObject((Boolean) o, objectName, oid);
+	    } else if (o instanceof String) {
+	        object = new StringObject((String) o, objectName, oid);
+	    } else if (o.getClass().isEnum()) {
+	        object = new StringObject(((Enum) o).name(), objectName, oid);
+	    } else { //complex object
+	        List<IOID> list = new ArrayList<IOID>();
+	        List<Field> fieldList = new ArrayList<Field>();
+	        Class tmpClass = o.getClass();
+	        while (tmpClass != null) {
+	            fieldList.addAll(Arrays.asList(tmpClass.getDeclaredFields()));
+	            tmpClass = tmpClass.getSuperclass();
+	        }
+    	    for (Field f : fieldList) {
+    	        f.setAccessible(true);
+    	        Object fContent = null;
+                try {
+                    fContent = f.get(o);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+    	        IOID retOid;
+    	        if (fContent instanceof Collection) {
+    	            retOid = addJavaCollection((Collection) fContent, f.getName(), false);
+    	        } else {
+    	            retOid = addJavaObject(fContent, f.getName(), false);
+    	        }
+                if (retOid != null) {
+                    list.add(retOid);
+                }
+    	    }
+    	    object = new ComplexObject(list, objectName, oid);
+	    }
+	    store.put(oid, object);
+	    if (isRoot) {
+	        ComplexObject root = (ComplexObject) retrieve(getEntryOID());
+	        root.getChildOIDs().add(oid);
+	    }
+	    return oid;
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void addJavaCollection(Collection o, String collectionName) {
-		throw new UnsupportedOperationException();
+        if (getEntryOID() == null) {
+            System.out.println("ERROR: Xml have to be loaded before adding java collections to store.");
+            return;
+        }
+		addJavaCollection(o, collectionName, true);
 	}
+	
+	@SuppressWarnings("rawtypes")
+    private OID addJavaCollection(Collection o, String collectionName, boolean isRoot) {
+        OID oid = generateUniqueOID();
+        List<IOID> list = new ArrayList<IOID>();
+        for (Object obj : o) {
+            IOID retOid;
+            if (obj instanceof Collection) {
+                retOid = addJavaCollection((Collection) obj, collectionName + ".member", false);
+            } else {
+                retOid = addJavaObject(obj, collectionName + ".member", false);
+            }
+            if (retOid != null) {
+                list.add(retOid);
+            }
+        }
+        ISBAObject object = new ComplexObject(list, collectionName, oid);
+        store.put(oid, object);
+        if (isRoot) {
+            ComplexObject root = (ComplexObject) retrieve(getEntryOID());
+            root.getChildOIDs().add(oid);
+        }
+        return oid;
+    }
 	
 	private IOID processNode(Node node) throws Exception {
 		if (node == null) {
 			return null;
 		}
-		OID oid = generateUniqueOID();
+		OID oid = null;
 		String name = node.getNodeName();
 		ISBAObject object = null;
 		switch (node.getNodeType()) {
 		case Node.ELEMENT_NODE:
+		    oid = generateUniqueOID();
 			NodeList nl = node.getChildNodes();
 			if (nl != null) {
 			    if (nl.getLength() == 1) { //mamy wartosc
@@ -99,7 +185,7 @@ public class SBAStore implements ISBAStore {
 			}
 			break;
 		case Node.TEXT_NODE:
-		    //natrafilismy na xmlowe smieci (pewnie '\n\t' albo cos w tym rodzaju)s
+		    //natrafilismy na xmlowe smieci (pewnie '\n\t' albo cos w tym rodzaju)
 		    return null;
 		case Node.DOCUMENT_NODE:
 			NodeList nodes = node.getChildNodes();
@@ -108,7 +194,7 @@ public class SBAStore implements ISBAStore {
 			}
             break;
         default:
-            throw new Exception("Not supported node type: " + node.getNodeType());
+            throw new Exception("Not supported XML node type: " + node.getNodeType());
         }
 		store.put(oid, object);
 		return oid;

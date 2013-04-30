@@ -1,6 +1,7 @@
 package edu.pjwstk.mherman.jps.main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.pjwstk.jps.result.ISingleResult;
@@ -12,6 +13,10 @@ import edu.pjwstk.mherman.jps.result.BooleanResult;
 import edu.pjwstk.mherman.jps.result.IntegerResult;
 import edu.pjwstk.mherman.jps.result.StringResult;
 import edu.pjwstk.mherman.jps.result.StructResult;
+import edu.pjwstk.mherman.jps.test.Address;
+import edu.pjwstk.mherman.jps.test.Car;
+import edu.pjwstk.mherman.jps.test.Car.CarType;
+import edu.pjwstk.mherman.jps.test.Driver;
 
 public class MainClass {
 
@@ -186,6 +191,17 @@ public class MainClass {
 		System.out.println("Wyniki dla testów mini-projektu 2: SBAStore");
 		SBAStore store = new SBAStore();
 		store.loadXML("../res/test.xml");
+		
+		Address addr1 = new Address("Krotka", "Pcim", "00-123");
+		Address addr2 = new Address("Dluga", "Zabrze", "12-321");
+		Car car1 = new Car(CarType.PASSENGER, "Ford", 2010);
+		Car car2 = new Car(CarType.DELIVERY, "Opel", 2009);
+		Car car3 = new Car(CarType.PASSENGER, "FIAT", 2012);
+		Driver driver1 = new Driver("Mietek", addr1, Arrays.asList(new Car[]{car1, car2}));
+		Driver driver2 = new Driver("Zenek", addr2, Arrays.asList(new Car[]{car3}));
+		store.addJavaObject(driver1, "driver1");
+		store.addJavaObject(driver2, "driver2");
+		
 		store.printStoreContent();
 
 	}

@@ -6,8 +6,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
+import edu.pjwstk.jps.datastore.IComplexObject;
 import edu.pjwstk.jps.datastore.IOID;
+import edu.pjwstk.jps.datastore.ISBAObject;
 import edu.pjwstk.jps.datastore.ISBAStore;
+import edu.pjwstk.jps.datastore.ISimpleObject;
 import edu.pjwstk.jps.interpreter.envs.IENVS;
 import edu.pjwstk.jps.interpreter.envs.IENVSBinder;
 import edu.pjwstk.jps.interpreter.envs.IENVSFrame;
@@ -15,6 +18,7 @@ import edu.pjwstk.jps.result.IAbstractQueryResult;
 import edu.pjwstk.jps.result.IBagResult;
 import edu.pjwstk.jps.result.ISimpleResult;
 import edu.pjwstk.jps.result.ISingleResult;
+import edu.pjwstk.jps.result.IStructResult;
 import edu.pjwstk.mherman.jps.result.BagResult;
 import edu.pjwstk.mherman.jps.result.BinderResult;
 import edu.pjwstk.mherman.jps.result.ReferenceResult;
@@ -41,15 +45,33 @@ public class ENVS implements IENVS {
 
     @Override
     public IBagResult bind(String name) {
-        List<ReferenceResult> tmpList = new ArrayList<ReferenceResult>();
+        List<ISingleResult> tmpList = new ArrayList<ISingleResult>();
         for (int i = envs.size(); i >=0; i--) {
             Collection<IENVSBinder> col = envs.get(i).getElements();
             for (IENVSBinder binder : col) {
                 if (binder.getName().equals(name)) {
-                    tmpList.add(new ReferenceResult()) //???
+                    tmpList.addAll(getAllSingleResults(binder.getValue()));
                 }
             }
+            if (tmpList.size() > 0) {
+                break;
+            }
         }
+        return new BagResult(tmpList);
+    }
+    
+    private List<ISingleResult> getAllSingleResults(IAbstractQueryResult aResult) {
+        List<ISingleResult> resList = new ArrayList<ISingleResult>();
+        if (aResult instanceof ISingleResult) {
+            resList.add((ISingleResult) aResult); 
+        } else if (aResult instanceof IBagResult) {
+            Collection<ISingleResult> collection = ((IBagResult) aResult).getElements();
+            resList.addAll(collection);
+        } else if (aResult instanceof IStructResult) {
+            List<ISingleResult> list = ((IStructResult) aResult).elements();
+            resList.addAll(list);
+        }
+        return resList;
     }
 
     @Override
@@ -86,7 +108,15 @@ public class ENVS implements IENVS {
                 return new ENVSFrame(tmpList);
             }
         } else if (result instanceof ReferenceResult) {
-            //TODO
+            ISBAObject referenceObject = store.retrieve(((ReferenceResult) result).getOIDValue());
+            if (referenceObject instanceof ISimpleObject) {
+                return new ENVSFrame(null);
+            } else { // referenceObject instanceof IComplexObject
+                List<IENVSBinder> tmpList = new ArrayList<IENVSBinder>();
+                for (IOID oid : ((IComplexObject) referenceObject).getChildOIDs()) {
+                    tmpList.add(new ENVSBinder(store.retrieve(oid).getName(), new ReferenceResult(oid)));
+                }
+            }
             return new ENVSFrame(null);
         } else {
             return new ENVSFrame(null);

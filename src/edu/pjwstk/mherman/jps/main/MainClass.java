@@ -4,206 +4,211 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.pjwstk.jps.datastore.IBooleanObject;
+import edu.pjwstk.jps.datastore.IIntegerObject;
+import edu.pjwstk.jps.datastore.ISBAObject;
+import edu.pjwstk.jps.datastore.IStringObject;
 import edu.pjwstk.jps.result.ISingleResult;
 import edu.pjwstk.mherman.jps.datastore.SBAStore;
+import edu.pjwstk.mherman.jps.envs.ENVS;
 import edu.pjwstk.mherman.jps.interpreter.qres.QResStack;
 import edu.pjwstk.mherman.jps.result.BagResult;
-import edu.pjwstk.mherman.jps.result.BinderResult;
-import edu.pjwstk.mherman.jps.result.BooleanResult;
-import edu.pjwstk.mherman.jps.result.IntegerResult;
+import edu.pjwstk.mherman.jps.result.ReferenceResult;
 import edu.pjwstk.mherman.jps.result.StringResult;
-import edu.pjwstk.mherman.jps.result.StructResult;
-import edu.pjwstk.mherman.jps.test.Address;
-import edu.pjwstk.mherman.jps.test.Car;
-import edu.pjwstk.mherman.jps.test.Car.CarType;
-import edu.pjwstk.mherman.jps.test.Driver;
 
 public class MainClass {
 
 	/**
 	 * @param args
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
-		// mini-projekt 2
-		System.out.println("Wyniki dla testów mini-projektu 2: QResStack");
-		{
-			// (struct(1, 2+1), (bag("test", „Ala”) as nazwa));
-			QResStack qres = new QResStack();
-			// comma
-			// struct
-			// comma
-			qres.push(new IntegerResult(1));
-			qres.push(new IntegerResult(2));
-			qres.push(new IntegerResult(1));
-			IntegerResult plusRight = (IntegerResult) qres.pop();
-			IntegerResult plusLeft = (IntegerResult) qres.pop();
-			IntegerResult plusResult = new IntegerResult(plusLeft.getValue() + plusRight.getValue());
-			qres.push(plusResult);
-			ISingleResult comma1Right = (ISingleResult) qres.pop();
-			ISingleResult comma1Left = (ISingleResult) qres.pop();
-			List<ISingleResult> tmpList = new ArrayList<ISingleResult>();
-			tmpList.add(comma1Left);
-			tmpList.add(comma1Right);
-			qres.push(new BagResult(tmpList));
-			// end comma
-			BagResult tmpBag = (BagResult) qres.pop();
-			qres.push(new StructResult(new ArrayList<ISingleResult>(tmpBag.getElements())));
-			// end struct
-			//as
-			//bag
-			//comma
-			qres.push(new StringResult("test"));
-			qres.push(new StringResult("Ala"));
-			ISingleResult comma2Right = (ISingleResult) qres.pop();
-			ISingleResult comma2Left = (ISingleResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.add(comma2Left);
-			tmpList.add(comma2Right);
-			qres.push(new BagResult(tmpList));
-			//end comma
-			tmpBag = (BagResult) qres.pop();
-			qres.push(new BagResult(new ArrayList<ISingleResult>(tmpBag.getElements())));
-			//end bag
-			BagResult tmpRes = (BagResult)qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			for (ISingleResult isr : tmpRes.getElements()) {
-				tmpList.add(new BinderResult("nazwa", isr));
-			}
-			qres.push(new BagResult(tmpList));
-			//end as
-			BagResult comma3Right = (BagResult) qres.pop();
-			StructResult comma3Left = (StructResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.addAll(comma3Left.elements());
-			tmpList.addAll(comma3Right.getElements());
-			qres.push(new BagResult(tmpList));
-			// end comma
-			System.out.println(qres.pop().toString());
-		}
-		
-		{
-			//(bag("ala"+" ma"+" kota"), bag(8*10, false));
-			QResStack qres = new QResStack();
-			//comma
-			//bag
-			//left plus
-			qres.push(new StringResult("ala"));
-			//right plus
-			qres.push(new StringResult(" ma"));
-			qres.push(new StringResult(" kota"));
-			StringResult plusRight = (StringResult) qres.pop();
-			StringResult plusLeft = (StringResult) qres.pop();
-			qres.push(new StringResult(plusLeft.getValue() + plusRight.getValue()));
-			//end right plus
-			plusRight = (StringResult) qres.pop();
-			plusLeft = (StringResult) qres.pop();
-			qres.push(new StringResult(plusLeft.getValue() + plusRight.getValue()));
-			//end left plus
-			List<ISingleResult> tmpList = new ArrayList<ISingleResult>();
-			tmpList.add((ISingleResult) qres.pop());
-			qres.push(new BagResult(tmpList));
-			//end bag
-			//bag
-			//comma
-			//multiply
-			qres.push(new IntegerResult(8));
-			qres.push(new IntegerResult(10));
-			IntegerResult multRight = (IntegerResult) qres.pop();
-			IntegerResult multLeft = (IntegerResult) qres.pop();
-			qres.push(new IntegerResult(multLeft.getValue() * multRight.getValue()));
-			//end multiply
-			qres.push(new BooleanResult(false));
-			ISingleResult comma1Right = (ISingleResult) qres.pop();
-			ISingleResult comma1Left = (ISingleResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.add(comma1Left);
-			tmpList.add(comma1Right);
-			qres.push(new BagResult(tmpList));
-			//end comma
-			BagResult tmpBag = (BagResult) qres.pop();
-			qres.push(new BagResult(new ArrayList<ISingleResult>(tmpBag.getElements())));
-			//end bag
-			BagResult comma2Right = (BagResult) qres.pop();
-			BagResult comma2Left = (BagResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.addAll(comma2Left.getElements());
-			tmpList.addAll(comma2Right.getElements());
-			qres.push(new BagResult(tmpList));
-			//end comma
-			System.out.println(qres.pop().toString());
-		}
-		
-		{
-			//(((bag(1, 2) groupas x), bag(3, 4), 5;
-			QResStack qres = new QResStack();
-			//comma
-			//groupas
-			//bag
-			//comma
-			qres.push(new IntegerResult(1));
-			qres.push(new IntegerResult(2));
-			ISingleResult comma1Right = (ISingleResult) qres.pop();
-			ISingleResult comma1Left = (ISingleResult) qres.pop();
-			ArrayList<ISingleResult> tmpList = new ArrayList<ISingleResult>();
-			tmpList.add(comma1Left);
-			tmpList.add(comma1Right);
-			qres.push(new BagResult(tmpList));
-			//end comma
-			BagResult tmpBag = (BagResult) qres.pop();
-			qres.push(new BagResult(new ArrayList<ISingleResult>(tmpBag.getElements())));
-			//end bag
-			tmpBag = (BagResult) qres.pop();
-			qres.push(new BinderResult("x", tmpBag));
-			//end groupas
-			//right comma
-			//bag
-			//comma
-			qres.push(new IntegerResult(3));
-			qres.push(new IntegerResult(4));
-			ISingleResult comma2Right = (ISingleResult) qres.pop();
-			ISingleResult comma2Left = (ISingleResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.add(comma2Left);
-			tmpList.add(comma2Right);
-			qres.push(new BagResult(tmpList));
-			//end comma
-			tmpBag = (BagResult) qres.pop();
-			qres.push(new BagResult(new ArrayList<ISingleResult>(tmpBag.getElements())));
-			//end bag
-			qres.push(new IntegerResult(5));
-			ISingleResult comma3Right = (ISingleResult) qres.pop();
-			BagResult comma3Left = (BagResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.addAll(comma3Left.getElements());
-			tmpList.add(comma3Right);
-			qres.push(new BagResult(tmpList));
-			//end right comma
-			BagResult comma4Right = (BagResult) qres.pop();
-			BinderResult comma4Left = (BinderResult) qres.pop();
-			tmpList = new ArrayList<ISingleResult>();
-			tmpList.add(comma4Left);
-			tmpList.addAll(comma4Right.getElements());
-			qres.push(new BagResult(tmpList));
-			//end comma
-			System.out.println(qres.pop().toString());
-		}
-		
-		System.out.println("Wyniki dla testów mini-projektu 2: SBAStore");
+	public static void main(String[] args) throws Exception {
+		// mini-projekt 3
 		SBAStore store = new SBAStore();
 		store.loadXML("../res/test.xml");
-		
-		Address addr1 = new Address("Krotka", "Pcim", "00-123");
-		Address addr2 = new Address("Dluga", "Zabrze", "12-321");
-		Car car1 = new Car(CarType.PASSENGER, "Ford", 2010);
-		Car car2 = new Car(CarType.DELIVERY, "Opel", 2009);
-		Car car3 = new Car(CarType.PASSENGER, "FIAT", 2012);
-		Driver driver1 = new Driver("Mietek", addr1, Arrays.asList(new Car[]{car1, car2}));
-		Driver driver2 = new Driver("Zenek", addr2, Arrays.asList(new Car[]{car3}));
-		store.addJavaObject(driver1, "driver1");
-		store.addJavaObject(driver2, "driver2");
-		
+		System.out.println("Loaded store:");
 		store.printStoreContent();
 
+		//((emp where married) union (emp where lName="Nowak")).fName
+		{
+		    ENVS envs = new ENVS();
+		    QResStack qres = new QResStack();
+		    envs.init(store.getEntryOID(), store);
+		    
+		    //dot
+		    //union
+		    //where
+		    BagResult empBag = (BagResult) envs.bind("emp");
+		    qres.push(empBag);
+		    empBag = (BagResult) qres.pop();
+		    List<ISingleResult> whereList = new ArrayList<ISingleResult>();
+		    for (ISingleResult sResult : empBag.getElements()) {
+		        envs.push(envs.nested(sResult, store));
+		        BagResult whereBindBag = (BagResult) envs.bind("married");
+		        qres.push(whereBindBag);
+		        whereBindBag = (BagResult) qres.pop();
+		        // if we have one boolean result that value is true
+		        if (whereBindBag.getElements().size() == 1) {
+		            ReferenceResult refRes = (ReferenceResult) whereBindBag.getElements().toArray()[0];
+		            ISBAObject obj = store.retrieve(refRes.getOIDValue());
+		            if (obj instanceof IBooleanObject
+		                    && ((IBooleanObject) obj).getValue()) {
+		                whereList.add(sResult);
+		            }
+		        }
+		        envs.pop();
+		    }
+		    BagResult whereRes = new BagResult(whereList);
+		    qres.push(whereRes);
+		    //end where
+		    //where
+		    empBag = (BagResult) envs.bind("emp");
+            qres.push(empBag);
+            empBag = (BagResult) qres.pop();
+            whereList = new ArrayList<ISingleResult>();
+            for (ISingleResult sResult : empBag.getElements()) {
+                envs.push(envs.nested(sResult, store));
+                BagResult whereBindBag = (BagResult) envs.bind("lName");
+                qres.push(whereBindBag);
+                whereBindBag = (BagResult) qres.pop();
+                // if we have one String result that value is "Nowak"
+                if (whereBindBag.getElements().size() == 1) {
+                    ReferenceResult refRes = (ReferenceResult) whereBindBag.getElements().toArray()[0];
+                    ISBAObject obj = store.retrieve(refRes.getOIDValue());
+                    if (obj instanceof IStringObject
+                            && ((IStringObject) obj).getValue().equals("Nowak")) {
+                        whereList.add(sResult);
+                    }
+                }
+                envs.pop();
+            }
+            whereRes = new BagResult(whereList);
+            qres.push(whereRes);
+		    //end where
+            List<ISingleResult> unionList = new ArrayList<ISingleResult>();
+            BagResult unionBag = (BagResult) qres.pop();
+            unionList.addAll(unionBag.getElements());
+            unionBag = (BagResult) qres.pop();
+            unionList.addAll(unionBag.getElements());
+            qres.push(new BagResult(unionList));
+		    //end union
+            BagResult dotBag = (BagResult) qres.pop();
+            List<ISingleResult> dotList = new ArrayList<ISingleResult>();
+            for (ISingleResult sResult : dotBag.getElements()) {
+                envs.push(envs.nested(sResult, store));
+                BagResult dotBindBag = (BagResult) envs.bind("fName");
+                qres.push(dotBindBag);
+                dotBindBag = (BagResult) qres.pop();
+                dotList.addAll(dotBindBag.getElements());
+                envs.pop();
+            }
+            qres.push(new BagResult(dotList));
+            //end dot
+            System.out.println("-----");
+            System.out.println("Query: ((emp where married) union (emp where lName=\"Nowak\")).fName");
+            System.out.println("Result: " + ((BagResult) qres.pop()).toString());
+		}
+		
+		// ((emp where exists address) where address.number>20).(street, city)
+		{
+		    ENVS envs = new ENVS();
+            QResStack qres = new QResStack();
+            envs.init(store.getEntryOID(), store);
+            
+            //dot
+            //outer where
+            //inner where
+            BagResult empBag = (BagResult) envs.bind("emp");
+            qres.push(empBag);
+            empBag = (BagResult) qres.pop();
+            List<ISingleResult> whereList = new ArrayList<ISingleResult>();
+            for (ISingleResult sResult : empBag.getElements()) {
+                envs.push(envs.nested(sResult, store));
+                //exists
+                BagResult existsBindBag = (BagResult) envs.bind("address");
+                qres.push(existsBindBag);
+                existsBindBag = (BagResult) qres.pop();
+                if (existsBindBag.getElements().size() >= 1) {
+                    whereList.add(sResult);
+                }
+                //end exists
+                envs.pop();
+            }
+            BagResult whereRes = new BagResult(whereList);
+            qres.push(whereRes);
+            //end inner where
+            empBag = (BagResult) qres.pop();
+            whereList = new ArrayList<ISingleResult>();
+            for (ISingleResult sResult : empBag.getElements()) {
+                envs.push(envs.nested(sResult, store));
+                //comparison
+                //dot
+                BagResult dotBindBag = (BagResult) envs.bind("address");
+                qres.push(dotBindBag);
+                dotBindBag = (BagResult) qres.pop();
+                List<ISingleResult> dotList = new ArrayList<ISingleResult>();
+                for (ISingleResult dResult : dotBindBag.getElements()) {
+                    envs.push(envs.nested(dResult, store));
+                    BagResult dotInnerBindBag = (BagResult) envs.bind("number");
+                    // if we have one Integer result 
+                    if (dotInnerBindBag.getElements().size() == 1) {
+                        ReferenceResult refRes = (ReferenceResult) dotInnerBindBag.getElements().toArray()[0];
+                        ISBAObject obj = store.retrieve(refRes.getOIDValue());
+                        if (obj instanceof IIntegerObject) {
+                            dotList.add(refRes);
+                        }
+                    }
+                    envs.pop();
+                }
+                qres.push(new BagResult(dotList));
+                //end dot
+                BagResult compBag = (BagResult) qres.pop();
+                if (compBag.getElements().size() != 1) {
+                    throw new Exception("Wrong number of elements to comparison");
+                }
+                ReferenceResult compRes = (ReferenceResult) compBag.getElements().toArray()[0];
+                ISBAObject obj = store.retrieve(compRes.getOIDValue());
+                if (!(obj instanceof IIntegerObject)) {
+                    throw new Exception("Wrong result type to comparison");
+                }
+                if (((IIntegerObject) obj).getValue() > 20) {
+                    whereList.add(sResult);
+                }
+                //end comparison
+                envs.pop();
+            }
+            whereRes = new BagResult(whereList);
+            qres.push(whereRes);
+            //end outer where
+            BagResult dotRes = (BagResult) qres.pop();
+            List<ISingleResult> dotList = new ArrayList<ISingleResult>();
+            for (ISingleResult sResult : dotRes.getElements()) {
+                envs.push(envs.nested(sResult, store));
+                //comma
+                StringResult sr1 = new StringResult("street");
+                StringResult sr2 = new StringResult("city");
+                qres.push(new BagResult(Arrays.asList(new ISingleResult[]{sr1, sr2})));
+                //end comma
+                BagResult dotBag = (BagResult) qres.pop();
+                for (ISingleResult dResult : dotBag.getElements()) {
+                    //envs.push(envs.nested(dResult, store));
+                    BagResult dotInnerBindBag = (BagResult) envs.bind(((StringResult) dResult).getValue());
+                    // if we have one result 
+                    if (dotInnerBindBag.getElements().size() == 1) {
+                        ReferenceResult refRes = (ReferenceResult) dotInnerBindBag.getElements().toArray()[0];
+                        dotList.add(refRes);
+                    }
+                    //envs.pop();
+                }
+                envs.pop();
+            }
+            qres.push(new BagResult(dotList));
+            //end dot
+            System.out.println("-----");
+            System.out.println("Query: ((emp where exists address) where address.number>20).(street, city)");
+            System.out.println("Result: " + ((BagResult) qres.pop()).toString());
+		}
+		System.out.println("--- End of program ---");
 	}
 
 }

@@ -46,7 +46,7 @@ public class ENVS implements IENVS {
     @Override
     public IBagResult bind(String name) {
         List<ISingleResult> tmpList = new ArrayList<ISingleResult>();
-        for (int i = envs.size(); i >=0; i--) {
+        for (int i = envs.size() - 1; i >=0; i--) {
             Collection<IENVSBinder> col = envs.get(i).getElements();
             for (IENVSBinder binder : col) {
                 if (binder.getName().equals(name)) {
@@ -116,8 +116,8 @@ public class ENVS implements IENVS {
                 for (IOID oid : ((IComplexObject) referenceObject).getChildOIDs()) {
                     tmpList.add(new ENVSBinder(store.retrieve(oid).getName(), new ReferenceResult(oid)));
                 }
+                return new ENVSFrame(tmpList);
             }
-            return new ENVSFrame(null);
         } else {
             return new ENVSFrame(null);
         }

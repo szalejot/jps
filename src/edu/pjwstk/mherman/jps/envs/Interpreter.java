@@ -1,6 +1,7 @@
 package edu.pjwstk.mherman.jps.envs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,6 +51,7 @@ import edu.pjwstk.jps.ast.unary.ISumExpression;
 import edu.pjwstk.jps.ast.unary.IUniqueExpression;
 import edu.pjwstk.jps.datastore.IDoubleObject;
 import edu.pjwstk.jps.datastore.IIntegerObject;
+import edu.pjwstk.jps.datastore.IOID;
 import edu.pjwstk.jps.datastore.ISBAObject;
 import edu.pjwstk.jps.datastore.ISBAStore;
 import edu.pjwstk.jps.interpreter.envs.IENVS;
@@ -57,6 +59,7 @@ import edu.pjwstk.jps.interpreter.envs.IInterpreter;
 import edu.pjwstk.jps.interpreter.qres.IQResStack;
 import edu.pjwstk.jps.result.IAbstractQueryResult;
 import edu.pjwstk.jps.result.IBagResult;
+import edu.pjwstk.jps.result.IBinderResult;
 import edu.pjwstk.jps.result.IBooleanResult;
 import edu.pjwstk.jps.result.IDoubleResult;
 import edu.pjwstk.jps.result.IIntegerResult;
@@ -131,10 +134,15 @@ public class Interpreter implements IInterpreter {
                 System.out.println("ERROR: Not IBooleanResult in visitAllExpression: " + res);
                 System.exit(1);
             }
-            if (!((IBooleanResult) res).getValue()) {
-                qres.push(new BooleanResult(false));
-                return;
+            try {
+                if (!((IBooleanResult) res).getValue()) {
+                    qres.push(new BooleanResult(false));
+                    return;
+                }
+            } finally {
+                envs.pop();
             }
+            
         }
         qres.push(new BooleanResult(true));
     }
@@ -164,9 +172,13 @@ public class Interpreter implements IInterpreter {
                 System.out.println("ERROR: Not IBooleanResult in visitAllExpression: " + res);
                 System.exit(1);
             }
-            if (((IBooleanResult) res).getValue()) {
-                qres.push(new BooleanResult(true));
-                return;
+            try {
+                if (((IBooleanResult) res).getValue()) {
+                    qres.push(new BooleanResult(true));
+                    return;
+                }
+            } finally {
+                envs.pop();
             }
         }
         qres.push(new BooleanResult(false));
@@ -255,26 +267,100 @@ public class Interpreter implements IInterpreter {
             envs.push(envs.nested(sRes, store));
             expr.getRightExpression().accept(this);
             eresList.addAll(getSingleResultList(qres.pop()));
+            envs.pop();
         }
         qres.push(new BagResult(eresList));
     }
 
     @Override
     public void visitEqualsExpression(IEqualsExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult i1 = qres.pop();
+        IAbstractQueryResult i2 = qres.pop();
+        qres.push(new BooleanResult(equals(i1, i2)));
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private boolean equals(final IAbstractQueryResult i1, final IAbstractQueryResult i2) {
+        IAbstractQueryResult loci1 = i1;
+        IAbstractQueryResult loci2 = i2;
+        try {
+            loci1 = getSingleResult(loci1);
+        } catch (TypeCoercionException e) {
+            // NOP
+        }
+        try {
+            loci2 = getSingleResult(loci2);
+        } catch (TypeCoercionException e) {
+            // NOP
+        }
+        if (loci1.getClass() != loci2.getClass()) {
+            return false;
+        } else if (loci1 instanceof ISimpleResult) {
+            Object obj1 = ((ISimpleResult) loci1).getValue();
+            Object obj2 = ((ISimpleResult) loci2).getValue();
+            return obj1.equals(obj2);
+        } else if (loci1 instanceof IReferenceResult) {
+            IOID oid1 = ((IReferenceResult) loci1).getOIDValue();
+            IOID oid2 = ((IReferenceResult) loci2).getOIDValue();
+            return oid1.equals(oid2);
+        } else {
+            return loci1.equals(loci2);
+        }
+    }
+    
+    /**
+     * 
+     * @param i1
+     * @param i2
+     * @return true if (i1 > i2)
+     */
+    private boolean greater(final IAbstractQueryResult i1, final IAbstractQueryResult i2) {
+        IAbstractQueryResult loci1 = null;
+        IAbstractQueryResult loci2 = null;
+        try {
+            loci1 = getSingleResult(i1);
+            loci2 = getSingleResult(i2);
+        } catch (TypeCoercionException e) {
+            System.out.println("TypeCoercionException in greater:" + i1 + ", " + i2);
+            System.exit(1);
+        }
+        if (!(loci1 instanceof IIntegerResult) || !(loci1 instanceof IDoubleResult) 
+                || !(loci2 instanceof IIntegerResult) || !(loci2 instanceof IDoubleResult)) {
+            System.out.println("Wrong types (not Integer/Double) in greater:" + loci1 + ", " + loci2);
+            System.exit(1);
+        }
+        double val1, val2;
+        if (loci1 instanceof IIntegerResult) {
+            val1 = ((IIntegerResult) loci1).getValue();
+        } else { // loci1 instanceof IDoubleResult
+            val1 = ((IDoubleResult) loci1).getValue();
+        }
+        if (loci2 instanceof IIntegerResult) {
+            val2 = ((IIntegerResult) loci2).getValue();
+        } else { // loci2 instanceof IDoubleResult
+            val2 = ((IDoubleResult) loci2).getValue();
+        }
+        return (val1 > val2);
     }
 
     @Override
     public void visitGreaterThanExpression(IGreaterThanExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult rightRes = qres.pop();
+        IAbstractQueryResult leftRes = qres.pop();
+        qres.push(new BooleanResult(greater(leftRes, rightRes)));
     }
 
     @Override
     public void visitGreaterOrEqualThanExpression(IGreaterOrEqualThanExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult rightRes = qres.pop();
+        IAbstractQueryResult leftRes = qres.pop();
+        qres.push(new BooleanResult(greater(leftRes, rightRes) || equals(leftRes, rightRes)));
     }
 
     @Override
@@ -307,20 +393,27 @@ public class Interpreter implements IInterpreter {
                 }
                 eresList.add(new StructResult(structList));
             }
+            envs.pop();
         }
         qres.push(new BagResult(eresList));
     }
 
     @Override
     public void visitLessOrEqualThanExpression(ILessOrEqualThanExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult rightRes = qres.pop();
+        IAbstractQueryResult leftRes = qres.pop();
+        qres.push(new BooleanResult(greater(rightRes, leftRes) || equals(leftRes, rightRes)));
     }
 
     @Override
     public void visitLessThanExpression(ILessThanExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult rightRes = qres.pop();
+        IAbstractQueryResult leftRes = qres.pop();
+        qres.push(new BooleanResult(greater(rightRes, leftRes)));
     }
 
     @Override
@@ -419,8 +512,11 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitNotEqualsExpression(INotEqualsExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult rightRes = qres.pop();
+        IAbstractQueryResult lefttRes = qres.pop();
+        qres.push(new BooleanResult(!equals(lefttRes, rightRes)));
     }
 
     @Override
@@ -513,6 +609,7 @@ public class Interpreter implements IInterpreter {
             if (((IBooleanResult) innerRes).getValue()) {
                 eresList.add(el);
             }
+            envs.pop();
         }
         qres.push(new BagResult(eresList));
     }
@@ -710,8 +807,38 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitUniqueExpression(IUniqueExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getInnerExpression().accept(this);
+        IAbstractQueryResult aRes = qres.pop();
+        try {
+            aRes = getSingleResult(aRes);
+        } catch (TypeCoercionException e) {
+            // NOP
+        }
+        if (aRes instanceof ISingleResult) {
+            qres.push(new BagResult(Arrays.asList(new ISingleResult[] {(ISingleResult) aRes})));
+        } else { // aRes instanceof ICollectionResult
+            List<ISingleResult> tmpList;
+            if (aRes instanceof IBagResult) {
+                tmpList = new ArrayList<ISingleResult>();
+                tmpList.addAll(((IBagResult) aRes).getElements());
+            } else { // aRes instanceof ISequenceResult
+                tmpList = ((ISequenceResult) aRes).getElements();
+            }
+            List<ISingleResult> resList = new ArrayList<ISingleResult>();
+            for (ISingleResult sRes : tmpList) {
+                boolean isUnique = true;
+                for (ISingleResult sInnerRes : resList) {
+                    if (equals(sRes, sInnerRes)) {
+                        isUnique = false;
+                        break;
+                    }
+                }
+                if (isUnique) {
+                    resList.add(sRes);
+                }
+            }
+            qres.push(new BagResult(resList));
+        }
     }
 
     @Override
@@ -758,9 +885,18 @@ public class Interpreter implements IInterpreter {
         return null;
     }
     
-    private ISingleResult getSingleResult(IAbstractQueryResult aResult) throws TypeCoercionException {
+    private ISingleResult getSingleResult(final IAbstractQueryResult aResult) throws TypeCoercionException {
         if (aResult instanceof ISingleResult) {
-            return (ISingleResult) aResult;
+            if (aResult instanceof IStructResult) {
+                List<ISingleResult> list = ((IStructResult) aResult).elements();
+                if (list.size() != 1) {
+                    throw new TypeCoercionException();
+                } else {
+                    return list.get(0);
+                }
+            } else {
+                return (ISingleResult) aResult;
+            }
         } else {
           if (aResult instanceof IBagResult) {
               Collection<ISingleResult> collection = ((IBagResult) aResult).getElements();
@@ -769,8 +905,8 @@ public class Interpreter implements IInterpreter {
               } else {
                   return (ISingleResult) collection.toArray()[0];
               }
-          } else if (aResult instanceof IStructResult) {
-              List<ISingleResult> list = ((IStructResult) aResult).elements();
+          } else if (aResult instanceof ISequenceResult) {
+              List<ISingleResult> list = ((ISequenceResult) aResult).getElements();
               if (list.size() != 1) {
                   throw new TypeCoercionException();
               } else {
@@ -781,10 +917,14 @@ public class Interpreter implements IInterpreter {
         throw new TypeCoercionException();
     }
     
-    private List<ISingleResult> getSingleResultList(IAbstractQueryResult result) {
+    private List<ISingleResult> getSingleResultList(final IAbstractQueryResult result) {
         List<ISingleResult> resList = new ArrayList<ISingleResult>();
         if (result instanceof ISingleResult) {
-            resList.add((ISingleResult) result);
+            if (result instanceof IStructResult) {
+                resList.addAll(((IStructResult) result).elements());
+            } else {
+                resList.add((ISingleResult) result);
+            }
         } else { // leftResult instanceof ICollectionResult
             if (result instanceof IBagResult) {
                 resList.addAll(((IBagResult) result).getElements());
@@ -796,17 +936,27 @@ public class Interpreter implements IInterpreter {
     }
     
     @SuppressWarnings("rawtypes")
-    private String getStringValue(ISingleResult result) {
+    private String getStringValue(final ISingleResult result) {
         if (result instanceof IStringResult) {
             return ((IStringResult) result).getValue();
         } else if (result instanceof ISimpleResult) {
             return ((ISimpleResult) result).getValue().toString();
+        } else if (result instanceof IStructResult) {
+            try {
+                return getStringValue(getSingleResult(result));
+            } catch (TypeCoercionException e) {
+                return "[TypeCoercionException in getStringValue]";
+            }
         } else if (result instanceof IReferenceResult) {
-            // TODO ???
-            return "";
-        } else {
-            // BINDER? STUCT?
-            return "";
+            IOID oid = ((IReferenceResult) result).getOIDValue();
+            return oid.toString();
+        } else { // result instanceof IBinderResult
+            IBinderResult binder = (IBinderResult) result;
+            try {
+                return getStringValue(getSingleResult(binder.getValue())) + " as " + binder.getName();
+            } catch (TypeCoercionException e) {
+                return "[TypeCoercionException in getStringValue]";
+            }
         }
     }
     

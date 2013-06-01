@@ -18,4 +18,8 @@ public class StructResult implements IStructResult {
 		return elements;
 	}
 
+    @Override
+    public String toString() {
+        return "StructResult [elements=" + elements + "]";
+    }
 }

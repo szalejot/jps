@@ -19,8 +19,7 @@ public class MinExpression implements IMinExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitMinExpression(this);
 	}
 
 }

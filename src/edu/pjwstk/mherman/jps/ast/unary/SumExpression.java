@@ -19,8 +19,7 @@ public class SumExpression implements ISumExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitSumExpression(this);
 	}
 
 }

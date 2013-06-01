@@ -19,8 +19,7 @@ public class BagExpression implements IBagExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitBagExpression(this);
 	}
 
 }

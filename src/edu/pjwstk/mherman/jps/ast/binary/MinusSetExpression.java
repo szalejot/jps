@@ -26,8 +26,7 @@ public class MinusSetExpression implements IMinusSetExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitMinusSetExpression(this);
 	}
 
 }

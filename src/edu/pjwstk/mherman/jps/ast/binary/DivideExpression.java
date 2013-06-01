@@ -26,8 +26,7 @@ public class DivideExpression implements IDivideExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitDivideExpression(this);
 	}
 
 }

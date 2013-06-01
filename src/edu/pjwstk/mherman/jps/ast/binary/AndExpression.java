@@ -26,8 +26,7 @@ public class AndExpression implements IAndExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitAndExpression(this);
 	}
 
 }

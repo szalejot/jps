@@ -13,8 +13,7 @@ public class DoubleTerminal implements IDoubleTerminal {
 	
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitDoubleTerminal(this);
 	}
 
 	@Override

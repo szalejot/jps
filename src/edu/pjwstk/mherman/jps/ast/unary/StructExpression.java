@@ -19,8 +19,7 @@ public class StructExpression implements IStructExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitStructExpression(this);
 	}
 
 }

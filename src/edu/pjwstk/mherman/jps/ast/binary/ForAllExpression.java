@@ -26,8 +26,7 @@ public class ForAllExpression implements IForAllExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitAllExpression(this);
 	}
 
 }

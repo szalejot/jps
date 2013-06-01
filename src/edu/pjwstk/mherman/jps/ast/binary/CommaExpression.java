@@ -26,8 +26,7 @@ public class CommaExpression implements ICommaExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitCommaExpression(this);
 	}
 
 }

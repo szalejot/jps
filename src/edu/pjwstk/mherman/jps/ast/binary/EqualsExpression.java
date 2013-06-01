@@ -26,8 +26,7 @@ public class EqualsExpression implements IEqualsExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitEqualsExpression(this);
 	}
 
 }

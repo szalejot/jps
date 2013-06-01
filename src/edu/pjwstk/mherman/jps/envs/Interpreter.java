@@ -186,8 +186,7 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitCloseByExpression(ICloseByExpression expr) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -365,14 +364,12 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitInExpression(IInExpression expr) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void visitIntersectExpression(IIntersectExpression expr) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -459,14 +456,12 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitMinusSetExpression(IMinusSetExpression expr) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void visitModuloExpression(IModuloExpression expr) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -521,8 +516,7 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitOrderByExpression(IOrderByExpression expr) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -616,38 +610,42 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitXORExpression(IXORExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult rightRes = qres.pop();
+        IAbstractQueryResult leftRes = qres.pop();
+        if (!(leftRes instanceof IBooleanResult) || !(rightRes instanceof IBooleanResult)) {
+            System.out.println("ERROR: Wrong types for XOR: " + leftRes + ", " + rightRes);
+            System.exit(1);
+        }
+        boolean left = ((IBooleanResult) leftRes).getValue();
+        boolean right = ((IBooleanResult) rightRes).getValue();
+        qres.push(new BooleanResult(left != right));
     }
 
     @Override
     public void visitBooleanTerminal(IBooleanTerminal expr) {
-        // TODO Auto-generated method stub
-
+        qres.push(new BooleanResult(expr.getValue()));
     }
 
     @Override
     public void visitDoubleTerminal(IDoubleTerminal expr) {
-        // TODO Auto-generated method stub
-
+        qres.push(new DoubleResult(expr.getValue()));
     }
 
     @Override
     public void visitIntegerTerminal(IIntegerTerminal expr) {
-        // TODO Auto-generated method stub
-
+        qres.push(new IntegerResult(expr.getValue()));
     }
 
     @Override
     public void visitNameTerminal(INameTerminal expr) {
-        // TODO Auto-generated method stub
-
+        qres.push(envs.bind(expr.getName()));
     }
 
     @Override
     public void visitStringTerminal(IStringTerminal expr) {
-        // TODO Auto-generated method stub
-
+        qres.push(new StringResult(expr.getValue()));
     }
 
     @Override
@@ -758,14 +756,24 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitNotExpression(INotExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getInnerExpression().accept(this);
+        IAbstractQueryResult sRes = qres.pop();
+        if (!(sRes instanceof IBooleanResult)) {
+            System.out.println("Illegal type for operation not: " + sRes);
+            System.exit(1);
+        }
+        qres.push(new BooleanResult(!((IBooleanResult) sRes).getValue()));
     }
 
     @Override
     public void visitStructExpression(IStructExpression expr) {
-        // TODO Auto-generated method stub
-
+        expr.getInnerExpression().accept(this);
+        IAbstractQueryResult sRes = qres.pop();
+        if (sRes instanceof IStructResult) {
+            qres.push(sRes);
+        } else {
+            qres.push(new StructResult(getSingleResultList(sRes)));
+        }
     }
 
     @Override
@@ -881,8 +889,8 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public IAbstractQueryResult eval(IExpression queryTreeRoot) {
-        // TODO Auto-generated method stub
-        return null;
+        queryTreeRoot.accept(this);
+        return qres.pop();
     }
     
     private ISingleResult getSingleResult(final IAbstractQueryResult aResult) throws TypeCoercionException {

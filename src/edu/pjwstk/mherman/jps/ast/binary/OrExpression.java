@@ -26,8 +26,7 @@ public class OrExpression implements IOrExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitOrExpression(this);
 	}
 
 }

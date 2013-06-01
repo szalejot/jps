@@ -13,8 +13,7 @@ public class NameTerminal implements INameTerminal {
 	
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitNameTerminal(this);
 	}
 
 	@Override

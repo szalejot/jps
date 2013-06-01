@@ -26,8 +26,7 @@ public class GreaterThanExpression implements IGreaterThanExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitGreaterThanExpression(this);
 	}
 
 }

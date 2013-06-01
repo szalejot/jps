@@ -13,8 +13,7 @@ public class StringTerminal implements IStringTerminal {
 	
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitStringTerminal(this);
 	}
 
 	@Override

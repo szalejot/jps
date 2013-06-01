@@ -19,8 +19,7 @@ public class ExistsExpression implements IExistsExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitExistsExpression(this);
 	}
 
 }

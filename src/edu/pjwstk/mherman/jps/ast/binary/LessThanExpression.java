@@ -26,8 +26,7 @@ public class LessThanExpression implements ILessThanExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitLessThanExpression(this);
 	}
 
 }

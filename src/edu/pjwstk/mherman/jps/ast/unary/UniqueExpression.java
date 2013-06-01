@@ -19,8 +19,7 @@ public class UniqueExpression implements IUniqueExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitUniqueExpression(this);
 	}
 
 }

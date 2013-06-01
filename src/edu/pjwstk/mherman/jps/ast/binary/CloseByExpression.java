@@ -26,8 +26,7 @@ public class CloseByExpression implements ICloseByExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitCloseByExpression(this);
 	}
 
 }

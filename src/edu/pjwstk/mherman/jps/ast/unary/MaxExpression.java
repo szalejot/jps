@@ -19,8 +19,7 @@ public class MaxExpression implements IMaxExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitMaxExpression(this);
 	}
 
 }

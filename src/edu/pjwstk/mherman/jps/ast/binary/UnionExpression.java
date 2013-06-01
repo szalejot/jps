@@ -26,8 +26,7 @@ public class UnionExpression implements IUnionExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitUnionExpression(this);
 	}
 
 }

@@ -19,8 +19,7 @@ public class CountExpression implements ICountExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitCountExpression(this);
 	}
 
 }

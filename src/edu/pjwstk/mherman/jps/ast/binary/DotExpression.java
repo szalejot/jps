@@ -26,8 +26,7 @@ public class DotExpression implements IDotExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitDotExpression(this);
 	}
 
 }

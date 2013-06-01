@@ -26,8 +26,7 @@ public class GroupAsExpression implements IGroupAsExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitGroupAsExpression(this);
 	}
 
 }

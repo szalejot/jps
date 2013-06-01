@@ -26,8 +26,7 @@ public class PlusExpression implements IPlusExpression {
 
 	@Override
 	public void accept(ASTVisitor visitor) {
-		// TODO Auto-generated method stub
-
+		visitor.visitPlusExpression(this);
 	}
 
 }

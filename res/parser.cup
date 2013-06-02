@@ -6,19 +6,23 @@ import java.util.List;
 
 import java_cup.runtime.DefaultSymbolFactory;
 import java_cup.runtime.Symbol;
-import edu.pjwstk.mherman.jps.ast.*;
+import edu.pjwstk.mherman.jps.ast.auxname.*;
+import edu.pjwstk.mherman.jps.ast.binary.*;
+import edu.pjwstk.mherman.jps.ast.terminal.*;
+import edu.pjwstk.mherman.jps.ast.unary.*;
+import edu.pjwstk.jps.ast.*;
 
 parser code {: 
 	public Lexer lexer;
 	private String expr;
-	public Expression RESULT;
+	public IExpression RESULT;
 	
-	public CalcParser(String expr) {
+	public SBAParser(String expr) {
 		this.symbolFactory = new DefaultSymbolFactory();   
 		this.expr = expr;
 	}
 	
-	void setResult(Expression exp) {
+	void setResult(IExpression exp) {
 		this.RESULT = exp;
 	}  
 
@@ -40,8 +44,8 @@ terminal String DIVIDE;
 terminal String LEFT_ROUND_BRACKET;
 terminal String RIGHT_ROUND_BRACKET;
 
-non terminal Expression goal;
-non terminal Expression expr;
+non terminal IExpression goal;
+non terminal IExpression expr;
 
 
 //priority

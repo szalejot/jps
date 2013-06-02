@@ -43,7 +43,10 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"*"						{ return createToken(MULTIPLY			); }
 	"/"						{ return createToken(DIVIDE				); }
 	"("						{ return createToken(LEFT_ROUND_BRACKET	); }
-	")"						{ return createToken(RIGHT_ROUND_BRACKET); }	
+	")"						{ return createToken(RIGHT_ROUND_BRACKET); }
+	"as"					{ return createToken(AS); }	
+	","						{ return createToken(COMMA); }
+	"bag"					{ return createToken(BAG); }	
 	 
 
 	{WHITESPACE} { }
@@ -76,5 +79,11 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 			throw new RuntimeException(e.getMessage());
 		}
 		return createToken(BOOLEAN_LITERAL, new Boolean(val));
+	}
+	{STRING} {
+		return createToken(STRING_LITERAL, yytext().substring(1, yytext().length()-1));
 	} 
+	{IDENTIFIER} {
+		return createToken(IDENTIFIER_LITERAL, yytext());
+	}
 }

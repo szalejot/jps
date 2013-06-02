@@ -250,8 +250,8 @@ public class Interpreter implements IInterpreter {
         ISingleResult i1 = null;
         ISingleResult i2 = null;
         try {
-            i1 = getSingleResult(qres.pop(), true);
             i2 = getSingleResult(qres.pop(), true);
+            i1 = getSingleResult(qres.pop(), true);
         } catch (TypeCoercionException ex) {
             System.out.println("ERROR: TypeCoercionException in visitDivideExpression");
             System.exit(1);
@@ -596,6 +596,7 @@ public class Interpreter implements IInterpreter {
         }
         if ((i1 instanceof IStringResult) || (i2 instanceof IStringResult)) {
             qres.push(new StringResult(getStringValue((ISimpleResult) i1) + getStringValue((ISimpleResult) i2)));
+            return;
         }
         if (!((i1 instanceof IIntegerResult) || (i1 instanceof IDoubleResult)) 
                 || !((i2 instanceof IIntegerResult) || (i2 instanceof IDoubleResult))) {

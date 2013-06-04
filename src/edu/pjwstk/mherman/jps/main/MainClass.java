@@ -27,16 +27,21 @@ public class MainClass {
 		QResStack qres = new QResStack();
 		Interpreter interpreter = new Interpreter(store, envs, qres);
 		String exitSequence = "exit";
+		String showStoreSequence = "showStore";
 		String curLine = "";
 		InputStreamReader converter = new InputStreamReader(System.in);
 		BufferedReader in = new BufferedReader(converter);
 		
 		do {
-		    System.out.println("---------------");
-		    System.out.println("Enter query (or '" + exitSequence + "' to exit)");
-		    curLine = in.readLine();
-		    
-		    if (exitSequence.equalsIgnoreCase(curLine)) {
+            System.out.println("---------------");
+            System.out.println("Enter query (or '" + exitSequence + "' to exit, '" + showStoreSequence
+                    + "' to show loaded store)");
+            curLine = in.readLine();
+
+		    if (showStoreSequence.equalsIgnoreCase(curLine)) {
+		        System.out.println("Loaded store:");
+		        store.printStoreContent();
+		    } else if (exitSequence.equalsIgnoreCase(curLine)) {
 		        System.out.println("exiting...");
 		        break;
 		    } else {

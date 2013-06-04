@@ -324,6 +324,8 @@ public class Interpreter implements IInterpreter {
         } catch (TypeCoercionException e) {
             // NOP
         }
+        loci1 = makeDerefenceIfReference(loci1);
+        loci2 = makeDerefenceIfReference(loci2);
         if (loci1.getClass() != loci2.getClass()) {
             return false;
         } else if (loci1 instanceof ISimpleResult) {
@@ -355,8 +357,8 @@ public class Interpreter implements IInterpreter {
             System.out.println("TypeCoercionException in greater:" + i1 + ", " + i2);
             System.exit(1);
         }
-        if (!(loci1 instanceof IIntegerResult) || !(loci1 instanceof IDoubleResult) 
-                || !(loci2 instanceof IIntegerResult) || !(loci2 instanceof IDoubleResult)) {
+        if (!((loci1 instanceof IIntegerResult) || (loci1 instanceof IDoubleResult)) 
+                || !((loci2 instanceof IIntegerResult) || (loci2 instanceof IDoubleResult))) {
             System.out.println("Wrong types (not Integer/Double) in greater:" + loci1 + ", " + loci2);
             System.exit(1);
         }
@@ -575,7 +577,7 @@ public class Interpreter implements IInterpreter {
             System.out.println("ERROR: Wrong expression results in visitAndExpression : " + leftRes + ", " + rightRes);
             System.exit(1);
         }
-        qres.push(new BooleanResult(((IBooleanResult) leftRes).getValue() && ((IBooleanResult) rightRes).getValue()));
+        qres.push(new BooleanResult(((IBooleanResult) leftRes).getValue() || ((IBooleanResult) rightRes).getValue()));
     }
 
     @SuppressWarnings("rawtypes")
@@ -646,6 +648,13 @@ public class Interpreter implements IInterpreter {
             envs.push(envs.nested(el, store));
             expr.getRightExpression().accept(this);
             IAbstractQueryResult innerRes = qres.pop();
+            try {
+                innerRes = getSingleResult(innerRes, true);
+            } catch (TypeCoercionException e) {
+                System.out.println("ERROR: Not IBooleanResult in right side of IWhereExpression: " + innerRes);
+                System.exit(1);
+            }
+            innerRes = makeDerefenceIfReference(innerRes);
             if (!(innerRes instanceof IBooleanResult)) {
                 System.out.println("ERROR: Not IBooleanResult in right side of IWhereExpression: " + innerRes);
                 System.exit(1);
@@ -790,13 +799,13 @@ public class Interpreter implements IInterpreter {
     public void visitNotExpression(INotExpression expr) {
         expr.getInnerExpression().accept(this);
         IAbstractQueryResult sRes = qres.pop();
-        sRes = makeDerefenceIfReference(sRes);
         try {
             sRes = getSingleResult(sRes, true);
         } catch (TypeCoercionException e) {
             System.out.println("Illegal type for operation not: " + sRes);
             System.exit(1);
         }
+        sRes = makeDerefenceIfReference(sRes);
         if (!(sRes instanceof IBooleanResult)) {
             System.out.println("Illegal type for operation not: " + sRes);
             System.exit(1);

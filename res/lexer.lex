@@ -46,7 +46,21 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	")"						{ return createToken(RIGHT_ROUND_BRACKET); }
 	"as"					{ return createToken(AS); }	
 	","						{ return createToken(COMMA); }
-	"bag"					{ return createToken(BAG); }	
+	"bag"					{ return createToken(BAG); }
+	"=="					{ return createToken(EQUALS); }
+	"!="					{ return createToken(NOT_EQUALS); }
+	">"						{ return createToken(MORE); }
+	"<"						{ return createToken(LESS); }
+	">="					{ return createToken(MORE_OR_EQUAL); }
+	"<="					{ return createToken(LESS_OR_EQUAL); }
+	"all"					{ return createToken(ALL); }
+	"any"					{ return createToken(ANY); }
+	"where"					{ return createToken(WHERE); }
+	"join"					{ return createToken(JOIN); }
+	"!"						{ return createToken(NOT); }
+	"and"					{ return createToken(AND); }
+	"or"					{ return createToken(OR); }	
+	"."						{ return createToken(DOT); }	
 	 
 
 	{WHITESPACE} { }

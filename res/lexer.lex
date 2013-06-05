@@ -61,12 +61,17 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"!"						{ return createToken(NOT); }
 	"and"					{ return createToken(AND); }
 	"or"					{ return createToken(OR); }	
+	"xor"					{ return createToken(XOR); }	
 	"."						{ return createToken(DOT); }
 	"min"					{ return createToken(MIN); }
 	"max"					{ return createToken(MAX); }
 	"sum"					{ return createToken(SUM); }
 	"avg"					{ return createToken(AVG); }	
-	 
+	"groupas"				{ return createToken(GROUPAS); }
+	"minus"					{ return createToken(MINUS_FUNCTION); }
+	"intersect"				{ return createToken(INTERSECT); }
+	"unique"				{ return createToken(UNIQUE); }
+	"in"					{ return createToken(IN); }
 
 	{WHITESPACE} { }
 	{INTEGER} {

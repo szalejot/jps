@@ -1,7 +1,6 @@
 package edu.pjwstk.mherman.jps.envs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -400,12 +399,42 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitInExpression(IInExpression expr) {
-        throw new UnsupportedOperationException();
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult i2 = makeDerefenceIfReference(qres.pop());
+        List<ISingleResult> list2 = getSingleResultList(i2, true);
+        IAbstractQueryResult i1 = makeDerefenceIfReference(qres.pop());
+        List<ISingleResult> list1 = getSingleResultList(i1, true);
+        outerloop:
+        for (ISingleResult sin1 : list1) {
+            for (ISingleResult sin2 : list2) {
+                if (equals(sin1, sin2)) {
+                    continue outerloop;
+                }
+            }
+            qres.push(new BooleanResult(false));
+            return;
+        }
+        qres.push(new BooleanResult(true));
     }
 
     @Override
     public void visitIntersectExpression(IIntersectExpression expr) {
-        throw new UnsupportedOperationException();
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult i2 = makeDerefenceIfReference(qres.pop());
+        List<ISingleResult> list2 = getSingleResultList(i2, true);
+        IAbstractQueryResult i1 = makeDerefenceIfReference(qres.pop());
+        List<ISingleResult> list1 = getSingleResultList(i1, true);
+        List<ISingleResult> resList = new ArrayList<ISingleResult>();
+        for (ISingleResult sin1 : list1) {
+            for (ISingleResult sin2 : list2) {
+                if (equals(sin1, sin2)) {
+                    resList.add(sin1);
+                }
+            }
+        }
+        qres.push(new BagResult(resList));
     }
 
     @Override
@@ -498,7 +527,23 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitMinusSetExpression(IMinusSetExpression expr) {
-        throw new UnsupportedOperationException();
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        IAbstractQueryResult i2 = makeDerefenceIfReference(qres.pop());
+        List<ISingleResult> list2 = getSingleResultList(i2, true);
+        IAbstractQueryResult i1 = makeDerefenceIfReference(qres.pop());
+        List<ISingleResult> list1 = getSingleResultList(i1, true);
+        List<ISingleResult> resList = new ArrayList<ISingleResult>();
+        outerloop:
+        for (ISingleResult sin1 : list1) {
+            for (ISingleResult sin2 : list2) {
+                if (equals(sin1, sin2)) {
+                    continue outerloop;
+                }
+            }
+            resList.add(sin1);
+        }
+        qres.push(new BagResult(resList));
     }
 
     @Override
@@ -898,31 +943,19 @@ public class Interpreter implements IInterpreter {
         } catch (TypeCoercionException e) {
             // NOP
         }
-        if (aRes instanceof ISingleResult) {
-            qres.push(new BagResult(Arrays.asList(new ISingleResult[] {(ISingleResult) aRes})));
-        } else { // aRes instanceof ICollectionResult
-            List<ISingleResult> tmpList;
-            if (aRes instanceof IBagResult) {
-                tmpList = new ArrayList<ISingleResult>();
-                tmpList.addAll(((IBagResult) aRes).getElements());
-            } else { // aRes instanceof ISequenceResult
-                tmpList = ((ISequenceResult) aRes).getElements();
-            }
-            List<ISingleResult> resList = new ArrayList<ISingleResult>();
-            for (ISingleResult sRes : tmpList) {
-                boolean isUnique = true;
-                for (ISingleResult sInnerRes : resList) {
-                    if (equals(sRes, sInnerRes)) {
-                        isUnique = false;
-                        break;
-                    }
-                }
-                if (isUnique) {
-                    resList.add(sRes);
+        aRes = makeDerefenceIfReference(aRes);
+        List<ISingleResult> tmpList = getSingleResultList(aRes, true);
+        List<ISingleResult> resList = new ArrayList<ISingleResult>();
+        outerloop:
+        for (ISingleResult sRes : tmpList) {
+            for (ISingleResult sInnerRes : resList) {
+                if (equals(sRes, sInnerRes)) {
+                    continue outerloop;
                 }
             }
-            qres.push(new BagResult(resList));
+            resList.add(sRes);
         }
+        qres.push(new BagResult(resList));
     }
 
     @Override

@@ -46,9 +46,15 @@ public class MainClass {
 		        break;
 		    } else {
         		SBAParser parser = new SBAParser(curLine);
+        		IExpression res = null;
+        		try {
         		parser.user_init();
                 parser.parse();
-                IExpression res = parser.RESULT;
+                res = parser.RESULT;
+        		} catch (Exception ex) {
+        		    System.out.println("Exception while parsing query, try again.");
+        		    continue;
+        		}
                 
                 res.accept(interpreter);
                 System.out.println("Result: " + qres.pop());

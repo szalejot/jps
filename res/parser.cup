@@ -47,6 +47,7 @@ terminal String AS;
 terminal String GROUPAS;
 terminal String COMMA;
 terminal String BAG;
+terminal String STRUCT;
 terminal String EQUALS;
 terminal String NOT_EQUALS;
 terminal String MORE;
@@ -90,7 +91,7 @@ precedence left MULTIPLY, DIVIDE, MODULO;
 precedence left AS, GROUPAS;
 precedence left MIN, MAX, SUM, AVG, MINUS_FUNCTION, INTERSECT, UNIQUE, IN;
 precedence left DOT;
-precedence left BAG;
+precedence left BAG, STRUCT;
 precedence left LEFT_ROUND_BRACKET, RIGHT_ROUND_BRACKET;
 
 start with goal;
@@ -130,6 +131,7 @@ expr  ::=
 	| 	SUM:o expr:e1	{: RESULT = new SumExpression(e1); :}
 	| 	AVG:o expr:e1	{: RESULT = new AvgExpression(e1); :}
 	| 	BAG:o expr:e1	{: RESULT = new BagExpression(e1); :}
+	| 	STRUCT:o expr:e1	{: RESULT = new StructExpression(e1); :}
 	| 	BOOLEAN_LITERAL:o {: RESULT = new BooleanTerminal((Boolean)o); :}
 	| 	IDENTIFIER_LITERAL:o {: RESULT = new NameTerminal((String)o); :}
 	| 	DOUBLE_LITERAL:o {: RESULT = new DoubleTerminal((Double)o); :}

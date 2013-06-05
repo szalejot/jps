@@ -48,6 +48,7 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"as"					{ return createToken(AS); }	
 	","						{ return createToken(COMMA); }
 	"bag"					{ return createToken(BAG); }
+	"struct"				{ return createToken(STRUCT); }
 	"=="					{ return createToken(EQUALS); }
 	"!="					{ return createToken(NOT_EQUALS); }
 	">"						{ return createToken(MORE); }

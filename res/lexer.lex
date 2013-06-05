@@ -42,6 +42,7 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"-"						{ return createToken(MINUS				); }
 	"*"						{ return createToken(MULTIPLY			); }
 	"/"						{ return createToken(DIVIDE				); }
+	"%"						{ return createToken(MODULO				); }
 	"("						{ return createToken(LEFT_ROUND_BRACKET	); }
 	")"						{ return createToken(RIGHT_ROUND_BRACKET); }
 	"as"					{ return createToken(AS); }	
@@ -60,7 +61,11 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"!"						{ return createToken(NOT); }
 	"and"					{ return createToken(AND); }
 	"or"					{ return createToken(OR); }	
-	"."						{ return createToken(DOT); }	
+	"."						{ return createToken(DOT); }
+	"min"					{ return createToken(MIN); }
+	"max"					{ return createToken(MAX); }
+	"sum"					{ return createToken(SUM); }
+	"avg"					{ return createToken(AVG); }	
 	 
 
 	{WHITESPACE} { }

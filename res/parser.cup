@@ -42,6 +42,7 @@ terminal String PLUS;
 terminal String MINUS;
 terminal String MULTIPLY; 
 terminal String DIVIDE;
+terminal String MODULO;
 terminal String AS;
 terminal String COMMA;
 terminal String BAG;
@@ -59,6 +60,10 @@ terminal String NOT;
 terminal String AND;
 terminal String OR;
 terminal String DOT;
+terminal String MIN;
+terminal String MAX;
+terminal String SUM;
+terminal String AVG;
 
 terminal String LEFT_ROUND_BRACKET;
 terminal String RIGHT_ROUND_BRACKET;
@@ -75,8 +80,9 @@ precedence left AND, OR;
 precedence left EQUALS, NOT_EQUALS, MORE, LESS, MORE_OR_EQUAL, LESS_OR_EQUAL;
 precedence left COMMA;
 precedence left PLUS, MINUS; 
-precedence left MULTIPLY, DIVIDE;
+precedence left MULTIPLY, DIVIDE, MODULO;
 precedence left AS;
+precedence left MIN, MAX, SUM, AVG;
 precedence left DOT;
 precedence left BAG;
 precedence left LEFT_ROUND_BRACKET, RIGHT_ROUND_BRACKET;
@@ -92,6 +98,7 @@ expr  ::=
 	| 	expr:e1 AS:o expr:e2	{: RESULT = new AsExpression(e1, ((NameTerminal) e2).getName()); :}
 	| 	expr:e1 MULTIPLY:o 	 expr:e2	{: RESULT = new MultiplyExpression(e1, e2); :}
 	| 	expr:e1 DIVIDE:o	 expr:e2	{: RESULT = new DivideExpression(e1, e2); :}
+	| 	expr:e1 MODULO:o	 expr:e2	{: RESULT = new ModuloExpression(e1, e2); :}
 	| 	expr:e1 COMMA:o	 expr:e2	{: RESULT = new CommaExpression(e1, e2); :}
 	| 	NOT:o expr:e1	{: RESULT = new NotExpression(e1); :}
 	| 	expr:e1 EQUALS:o expr:e2	{: RESULT = new EqualsExpression(e1, e2); :}
@@ -106,6 +113,10 @@ expr  ::=
 	| 	expr:e1 OR:o expr:e2	{: RESULT = new OrExpression(e1, e2); :}
 	| 	expr:e1 WHERE:o expr:e2	{: RESULT = new WhereExpression(e1, e2); :}
 	| 	expr:e1 JOIN:o expr:e2	{: RESULT = new JoinExpression(e1, e2); :}
+	| 	MIN:o expr:e1	{: RESULT = new MinExpression(e1); :}
+	| 	MAX:o expr:e1	{: RESULT = new MaxExpression(e1); :}
+	| 	SUM:o expr:e1	{: RESULT = new SumExpression(e1); :}
+	| 	AVG:o expr:e1	{: RESULT = new AvgExpression(e1); :}
 	| 	BAG:o expr:e1	{: RESULT = new BagExpression(e1); :}
 	| 	BOOLEAN_LITERAL:o {: RESULT = new BooleanTerminal((Boolean)o); :}
 	| 	IDENTIFIER_LITERAL:o {: RESULT = new NameTerminal((String)o); :}

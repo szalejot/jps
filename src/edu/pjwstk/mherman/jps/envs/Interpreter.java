@@ -503,7 +503,45 @@ public class Interpreter implements IInterpreter {
 
     @Override
     public void visitModuloExpression(IModuloExpression expr) {
-        throw new UnsupportedOperationException();
+        expr.getLeftExpression().accept(this);
+        expr.getRightExpression().accept(this);
+        ISingleResult i1 = null;
+        ISingleResult i2 = null;
+        try {
+            i2 = getSingleResult(qres.pop(), true);
+            i1 = getSingleResult(qres.pop(), true);
+        } catch (TypeCoercionException ex) {
+            System.out.println("ERROR: TypeCoercionException in visitModuloExpression");
+            System.exit(1);
+        }
+        i1 = (ISingleResult) makeDerefenceIfReference(i1);
+        i2 = (ISingleResult) makeDerefenceIfReference(i2);
+        if (!((i1 instanceof IIntegerResult) || (i1 instanceof IDoubleResult)) 
+                || !((i2 instanceof IIntegerResult) || (i2 instanceof IDoubleResult))) {
+            System.out.println("ERROR: wrong types for visitModuloExpression");
+            System.exit(1);
+        }
+        Double resVal = 0d;
+        boolean isResDouble = false;
+        if (i1 instanceof IIntegerResult) {
+            resVal += ((IIntegerResult) i1).getValue();
+        } else {
+            resVal += ((IDoubleResult) i1).getValue();
+            isResDouble = true;
+        }
+        if (i2 instanceof IIntegerResult) {
+            resVal %= ((IIntegerResult) i2).getValue();
+        } else {
+            resVal %= ((IDoubleResult) i2).getValue();
+            isResDouble = true;
+        }
+        ISingleResult res;
+        if (isResDouble) {
+            res = new DoubleResult(resVal);
+        } else {
+            res = new IntegerResult(resVal.intValue());
+        }
+        qres.push(res);
     }
 
     @Override
@@ -712,7 +750,7 @@ public class Interpreter implements IInterpreter {
     @Override
     public void visitBagExpression(IBagExpression expr) {
         expr.getInnerExpression().accept(this);
-        qres.push(new BagResult(getSingleResultList(qres.pop(), false))); // ONE LINE! :-D
+        qres.push(new BagResult(getSingleResultList(qres.pop(), true))); // ONE LINE! :-D
     }
 
     @Override

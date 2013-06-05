@@ -73,6 +73,7 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"intersect"				{ return createToken(INTERSECT); }
 	"unique"				{ return createToken(UNIQUE); }
 	"in"					{ return createToken(IN); }
+	"count"					{ return createToken(COUNT); }
 
 	{WHITESPACE} { }
 	{INTEGER} {

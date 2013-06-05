@@ -71,6 +71,7 @@ terminal String MINUS_FUNCTION;
 terminal String INTERSECT;
 terminal String UNIQUE;
 terminal String IN;
+terminal String COUNT;
 
 terminal String LEFT_ROUND_BRACKET;
 terminal String RIGHT_ROUND_BRACKET;
@@ -89,7 +90,7 @@ precedence left COMMA;
 precedence left PLUS, MINUS; 
 precedence left MULTIPLY, DIVIDE, MODULO;
 precedence left AS, GROUPAS;
-precedence left MIN, MAX, SUM, AVG, MINUS_FUNCTION, INTERSECT, UNIQUE, IN;
+precedence left MIN, MAX, SUM, AVG, MINUS_FUNCTION, INTERSECT, UNIQUE, IN, COUNT;
 precedence left DOT;
 precedence left BAG, STRUCT;
 precedence left LEFT_ROUND_BRACKET, RIGHT_ROUND_BRACKET;
@@ -126,6 +127,7 @@ expr  ::=
 	| 	expr:e1 INTERSECT:o expr:e2	{: RESULT = new IntersectExpression(e1, e2); :}
 	| 	expr:e1 IN:o expr:e2	{: RESULT = new InExpression(e1, e2); :}
 	| 	UNIQUE:o expr:e1	{: RESULT = new UniqueExpression(e1); :}
+	| 	COUNT:o expr:e1	{: RESULT = new CountExpression(e1); :}
 	| 	MIN:o expr:e1	{: RESULT = new MinExpression(e1); :}
 	| 	MAX:o expr:e1	{: RESULT = new MaxExpression(e1); :}
 	| 	SUM:o expr:e1	{: RESULT = new SumExpression(e1); :}

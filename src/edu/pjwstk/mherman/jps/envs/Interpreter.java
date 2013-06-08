@@ -717,8 +717,10 @@ public class Interpreter implements IInterpreter {
         expr.getLeftExpression().accept(this);
         expr.getRightExpression().accept(this);
         List<ISingleResult> eresList = new ArrayList<ISingleResult>();
-        eresList.addAll(getSingleResultList(qres.pop(), false));
-        eresList.addAll(getSingleResultList(qres.pop(), false));
+        List<ISingleResult> rightResList = getSingleResultList(qres.pop(), false);
+        List<ISingleResult> leftResList = getSingleResultList(qres.pop(), false);
+        eresList.addAll(leftResList);
+        eresList.addAll(rightResList);
         qres.push(new BagResult(eresList));
     }
 

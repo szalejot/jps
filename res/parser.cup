@@ -72,6 +72,7 @@ terminal String INTERSECT;
 terminal String UNIQUE;
 terminal String IN;
 terminal String COUNT;
+terminal String UNION;
 
 terminal String LEFT_ROUND_BRACKET;
 terminal String RIGHT_ROUND_BRACKET;
@@ -84,6 +85,7 @@ non terminal IExpression expr;
 precedence left WHERE, JOIN;
 precedence left ALL, ANY;
 precedence left NOT;
+precedence left IN, UNION;
 precedence left AND, OR, XOR;
 precedence left EQUALS, NOT_EQUALS, MORE, LESS, MORE_OR_EQUAL, LESS_OR_EQUAL;
 precedence left COMMA;
@@ -126,6 +128,7 @@ expr  ::=
 	| 	expr:e1 MINUS_FUNCTION:o expr:e2	{: RESULT = new MinusSetExpression(e1, e2); :}
 	| 	expr:e1 INTERSECT:o expr:e2	{: RESULT = new IntersectExpression(e1, e2); :}
 	| 	expr:e1 IN:o expr:e2	{: RESULT = new InExpression(e1, e2); :}
+	| 	expr:e1 UNION:o expr:e2	{: RESULT = new UnionExpression(e1, e2); :}
 	| 	UNIQUE:o expr:e1	{: RESULT = new UniqueExpression(e1); :}
 	| 	COUNT:o expr:e1	{: RESULT = new CountExpression(e1); :}
 	| 	MIN:o expr:e1	{: RESULT = new MinExpression(e1); :}

@@ -74,6 +74,7 @@ WHITESPACE = {LineTerminator} | [ \t\f]
 	"unique"				{ return createToken(UNIQUE); }
 	"in"					{ return createToken(IN); }
 	"count"					{ return createToken(COUNT); }
+	"union"					{ return createToken(UNION); }
 
 	{WHITESPACE} { }
 	{INTEGER} {
